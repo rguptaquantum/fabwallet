@@ -5,6 +5,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
+import com.rguptaquantum.fabwallet.model.AuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,11 +21,13 @@ import java.util.*;
 @Component
 public class JwtTokenProvider {
 
-    @Value("${security.jwt.token.expire-length:3600000}")
+    @Value("${security.jwt.token.expirelength}")
     private long validityInMilliseconds = 3600000;
 
-    @Value("${security.jwt.token.secret-key:secret-key}")
+    @Value("${security.jwt.token.secret-key}")
     private String secretKey;
+
+    private static final String TOKEN_TYPE = "Bearer";
 
     @PostConstruct
     protected void init() {
@@ -34,7 +37,9 @@ public class JwtTokenProvider {
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
-    public String createToken(String username) {
+
+
+    public AuthenticationToken createToken(String username) {
 
 
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
@@ -43,12 +48,14 @@ public class JwtTokenProvider {
         Date validity = new Date(now.getTime() + validityInMilliseconds);
 
 
-        return JWT.create()
+        String token = JWT.create()
                 .withIssuer("auth0")
                 .withSubject(username)
                 .withIssuedAt(now)
                 .withExpiresAt(validity)
                 .sign(algorithm);
+
+        return new AuthenticationToken(token,TOKEN_TYPE,validityInMilliseconds);
     }
 
     public Authentication getAuthentication(String token) throws JWTVerificationException, UsernameNotFoundException  {
@@ -60,7 +67,7 @@ public class JwtTokenProvider {
 
     public String resolveToken(HttpServletRequest req) {
         String bearerToken = req.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+        if (bearerToken != null && bearerToken.startsWith(TOKEN_TYPE+" ")) {
             return bearerToken.substring(7);
         }
         return null;
