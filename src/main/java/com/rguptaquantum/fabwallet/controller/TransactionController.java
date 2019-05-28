@@ -3,8 +3,6 @@ package com.rguptaquantum.fabwallet.controller;
 
 import com.rguptaquantum.fabwallet.dto.TransactionDTO;
 import com.rguptaquantum.fabwallet.exception.WalletException;
-import com.rguptaquantum.fabwallet.model.AuthenticationToken;
-import com.rguptaquantum.fabwallet.model.Transaction;
 import com.rguptaquantum.fabwallet.service.TransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,12 +23,13 @@ public class TransactionController {
 
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @PostMapping(value = "/addMoney",  produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/addMoney",  produces = MediaType.TEXT_PLAIN_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public String addMoney(Authentication authentication, @RequestBody TransactionDTO transactionDTO) throws WalletException {
+        transactionDTO.validate();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String userName = userDetails.getUsername();
-        logger.debug("User with username : "+userName+" is adding money in...");
+        logger.debug("User with username : "+userName+" is adding money into his account");
         return transactionService.addMoney(userName,transactionDTO);
     }
 
@@ -39,7 +38,17 @@ public class TransactionController {
     public List<TransactionDTO> getTransactions(Authentication authentication) throws WalletException {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String userName = userDetails.getUsername();
-        logger.debug("User with username : "+userName+" is fetching transactions in...");
+        logger.debug("User with username : "+userName+" is fetching transactions from his account");
         return transactionService.getTransactions(userName);
+    }
+
+    @PostMapping(value = "/payMoney",  produces = MediaType.TEXT_PLAIN_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String payMoney(Authentication authentication, @RequestBody TransactionDTO transactionDTO) throws WalletException {
+        transactionDTO.validate();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String userName = userDetails.getUsername();
+        logger.debug("User with username : "+userName+" is paying money from his account");
+        return transactionService.payMoney(userName,transactionDTO);
     }
 }
