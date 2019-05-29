@@ -13,6 +13,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@Table(name = "wallet", schema = "fabwallet")
 public class Wallet {
     @Id
     @Column(name = "id",nullable = false)

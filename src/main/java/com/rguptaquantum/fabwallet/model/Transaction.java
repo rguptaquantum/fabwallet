@@ -11,6 +11,7 @@ import java.util.Date;
 @Entity
 @Getter
 @Setter
+@Table(name = "transaction", schema = "fabwallet")
 public class Transaction {
     @Id
     @Column(name = "id",nullable = false)

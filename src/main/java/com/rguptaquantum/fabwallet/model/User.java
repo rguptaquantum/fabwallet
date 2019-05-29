@@ -12,6 +12,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@Table(name = "user", schema = "fabwallet")
 public class User {
 
     @Id
@@ -30,9 +31,6 @@ public class User {
 
     @ElementCollection(fetch = FetchType.EAGER)
     List<Role> roles;
-
-    @OneToOne
-    private Wallet wallet;
 
     public User() {}
 

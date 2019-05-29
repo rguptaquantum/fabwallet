@@ -1,3 +1,5 @@
+CREATE SCHEMA IF NOT EXISTS fabwallet;
+
 USE fabwallet;
 
 CREATE TABLE IF NOT EXISTS `user` (
